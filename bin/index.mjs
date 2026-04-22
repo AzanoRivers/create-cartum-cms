@@ -268,9 +268,9 @@ const MESSAGES = {
 
 // ── Header ────────────────────────────────────────────────────────────────────
 console.log('')
-console.log(kleur.bold().cyan('  ╔═══════════════════════╗'))
+console.log(kleur.bold().cyan('  ╔═════════════════════════╗'))
 console.log(kleur.bold().cyan('  ║') + kleur.bold('   C A R T U M   C M S   ') + kleur.bold().cyan('║'))
-console.log(kleur.bold().cyan('  ╚═══════════════════════╝'))
+console.log(kleur.bold().cyan('  ╚═════════════════════════╝'))
 console.log(kleur.dim('         by AzanoLabs'))
 console.log('')
 
