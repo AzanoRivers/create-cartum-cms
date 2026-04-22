@@ -114,7 +114,11 @@ function faceSpinner(frames, msg) {
 function faceMoment(expr, msg, ms = 700) {
   return new Promise(resolve => {
     process.stdout.write('\n' + box(expr, kleur.dim(msg), kleur.cyan) + '\n')
-    setTimeout(resolve, ms)
+    setTimeout(() => {
+      // erase the 4 lines (leading \n + 3 box lines) and park cursor at start
+      process.stdout.write(UP(4) + (CLR() + '\n').repeat(4) + UP(4))
+      resolve()
+    }, ms)
   })
 }
 
@@ -319,7 +323,7 @@ if (tags.length > 1) {
 }
 
 // ── Clone ─────────────────────────────────────────────────────────────────────
-const ref = selectedTag ? `#${selectedTag}` : ''
+const ref = selectedTag ? `#${selectedTag}` : '#master'
 const sp2 = faceSpinner(FACE.work, t.sp.clone)
 try {
   await downloadTemplate(`github:${REPO}${ref}`, { dir: dest, force: true })
