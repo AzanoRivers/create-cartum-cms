@@ -1,6 +1,6 @@
 {
   "name": "create-cartum-cms",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scaffold a new Cartum CMS project",
   "type": "module",
   "bin": {
