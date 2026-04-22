@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import prompts from 'prompts'
 import { downloadTemplate } from 'giget'
-import { execSync } from 'child_process'
+import { spawn } from 'child_process'
 import { writeFileSync, existsSync } from 'fs'
 import { copyFile } from 'fs/promises'
 import kleur from 'kleur'
@@ -10,8 +10,7 @@ import kleur from 'kleur'
 const REPO = 'AzanoRivers/cartum-cms'
 
 // ── ANSI ──────────────────────────────────────────────────────────────────────
-const UP  = n => `\x1b[${n}A`
-const CLR = () => `\x1b[2K\r`
+const CLEAR_LINE = '\r\x1b[2K'
 
 // ── Face expressions ──────────────────────────────────────────────────────────
 //  Each sequence tells a small story — neutral, look around, blink, think, etc.
@@ -64,61 +63,57 @@ const FACE = {
   storage:   '◕ ¬ ◕',  // thinking about storage
   email:     '◕ ω ◕',  // cute/friendly
   happy:     '◕ ‿ ◕',  // happy
-  excited:   '^ ‿ ^',  // very happy
-  oops:      '✖ ︿ ✖',  // error
+  excited:   '✦ ^ ‿ ^ ✦',  // stars + very happy
+  oops:      '✖ ︿ ✖',      // error
 }
 
-// ── Box renderer (3 lines, no trailing newline) ───────────────────────────────
-function box(expr, msg, c = kleur.cyan) {
-  return (
-    CLR() + `  ${c('╭─────────╮')}\n` +
-    CLR() + `  ${c('│')}  ${expr}  ${c('│')}  ${msg}\n` +
-    CLR() + `  ${c('╰─────────╯')}`
-  )
-}
-
-// ── Animated face spinner ─────────────────────────────────────────────────────
-// Organic timing: each frame has a slightly different delay for a natural feel.
+// ── Spinner ───────────────────────────────────────────────────────────────────
+// Single-line with \r — reliable in-place animation on all terminals/Windows
 function faceSpinner(frames, msg) {
   let i = 0
-  process.stdout.write('\n' + box(frames[0], kleur.dim(msg)))
+  process.stdout.write(`  ${kleur.cyan(frames[0])}  ${kleur.dim('│')}  ${kleur.dim(msg)}`)
 
+  let id
   function tick() {
     i++
-    process.stdout.write('\r' + UP(2) + box(frames[i % frames.length], kleur.dim(msg)))
-    // Vary delay: blink frames (– _ –, – ◡ –) are shorter; hold frames longer
     const expr = frames[i % frames.length]
+    process.stdout.write(`${CLEAR_LINE}  ${kleur.cyan(expr)}  ${kleur.dim('│')}  ${kleur.dim(msg)}`)
     const delay = expr.includes('–')
-      ? 80 + Math.random() * 60    // blink: fast
-      : 160 + Math.random() * 120  // normal: organic
+      ? 60  + Math.random() * 50   // blink: fast
+      : 140 + Math.random() * 110  // normal: organic
     id = setTimeout(tick, delay)
   }
-
-  let id = setTimeout(tick, 200)
+  id = setTimeout(tick, 180)
 
   return {
     succeed(doneMsg) {
       clearTimeout(id)
-      process.stdout.write('\r' + UP(2) + box(FACE.happy, kleur.dim(doneMsg), kleur.green) + '\n')
+      process.stdout.write(`${CLEAR_LINE}  ${kleur.green(FACE.happy)}  ${kleur.green('│')}  ${kleur.green(doneMsg)}\n`)
     },
     fail(errMsg) {
       clearTimeout(id)
-      process.stdout.write('\r' + UP(2) + box(FACE.oops, kleur.red(errMsg), kleur.red) + '\n')
+      process.stdout.write(`${CLEAR_LINE}  ${kleur.red(FACE.oops)}  ${kleur.red('│')}  ${kleur.red(errMsg)}\n`)
     },
   }
 }
 
-// ── One-shot face moment (reaction before a prompts section) ──────────────────
-// Draws the face box then waits briefly — gives the "reaction" feel.
-// Returns a promise so you can await it.
-function faceMoment(expr, msg, ms = 700) {
+// ── Face moment (brief reaction, single-line, self-erasing) ───────────────────
+function faceMoment(expr, msg, ms = 650) {
   return new Promise(resolve => {
-    process.stdout.write('\n' + box(expr, kleur.dim(msg), kleur.cyan) + '\n')
+    process.stdout.write(`  ${kleur.cyan(expr)}  ${kleur.dim('│')}  ${kleur.dim(msg)}`)
     setTimeout(() => {
-      // erase the 4 lines (leading \n + 3 box lines) and park cursor at start
-      process.stdout.write(UP(4) + (CLR() + '\n').repeat(4) + UP(4))
+      process.stdout.write(CLEAR_LINE)
       resolve()
     }, ms)
+  })
+}
+
+// ── Async install — spawn keeps event loop free so animation stays alive ───────
+function runInstall(pm, cwd) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(pm, ['install'], { cwd, stdio: 'pipe', shell: true })
+    proc.on('close', code => code === 0 ? resolve() : reject(new Error(`exit ${code}`)))
+    proc.on('error', reject)
   })
 }
 
@@ -448,18 +443,17 @@ if (doInstall) {
   const pm  = detectPm()
   const sp3 = faceSpinner(FACE.work, t.sp.install)
   try {
-    execSync(`${pm} install`, { cwd: dest, stdio: 'pipe' })
+    await runInstall(pm, dest)
     sp3.succeed(t.ok.install)
   } catch {
     sp3.fail(`${t.err.install} \`${pm} install\` ${t.err.manually}`)
   }
 }
 
-// ── Done — excited face ───────────────────────────────────────────────────────
+// ── Done ─────────────────────────────────────────────────────────────────────
 console.log('')
-console.log(kleur.bold().cyan('  ╭─────────╮'))
-console.log(kleur.bold().cyan('  │') + '  ' + FACE.excited + '  ' + kleur.bold().cyan('│') + '  ' + kleur.bold().green(t.ready))
-console.log(kleur.bold().cyan('  ╰─────────╯'))
+console.log(`  ${kleur.cyan(FACE.excited)}  ${kleur.bold().green(t.ready)}`)
+console.log('')
 console.log('')
 console.log(kleur.bold(`  ${t.nextSteps}`))
 console.log('')
