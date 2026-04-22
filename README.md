@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/AzanoRivers/cartum-cms/main/public/images/brand/icon.svg" width="72" alt="Cartum CMS" />
+  <img src="https://cartum.azanolabs.com/images/brand/icon.svg" width="72" alt="Cartum CMS" />
 
   # create-cartum-cms
 
@@ -104,6 +104,6 @@ pnpm dev       # start development server
 
 <div align="center">
 
-Supported by [AzanoLabs](https://github.com/AzanoRivers)
+Made with ❤️ by [AzanoLabs](https://github.com/AzanoRivers)
 
 </div>

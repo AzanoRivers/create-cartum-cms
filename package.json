@@ -27,15 +27,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AzanoRivers/create-cartum-cms.git"
+    "url": "git+https://github.com/AzanoRivers/create-cartum-cms.git"
   },
   "homepage": "https://github.com/AzanoRivers/create-cartum-cms#readme",
   "bugs": {
     "url": "https://github.com/AzanoRivers/create-cartum-cms/issues"
   },
   "dependencies": {
+    "giget": "^3.2.0",
     "kleur": "^4.1.5",
-    "prompts": "^2.4.2",
-    "tiged": "^2.12.7"
+    "prompts": "^2.4.2"
   }
 }

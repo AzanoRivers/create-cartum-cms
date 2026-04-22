@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import prompts from 'prompts'
-import tiged from 'tiged'
+import { downloadTemplate } from 'giget'
 import { execSync } from 'child_process'
 import { writeFileSync, existsSync } from 'fs'
 import { copyFile } from 'fs/promises'
@@ -322,7 +322,7 @@ if (tags.length > 1) {
 const ref = selectedTag ? `#${selectedTag}` : ''
 const sp2 = faceSpinner(FACE.work, t.sp.clone)
 try {
-  await tiged(`${REPO}${ref}`, { cache: false, force: true }).clone(dest)
+  await downloadTemplate(`github:${REPO}${ref}`, { dir: dest, force: true })
   sp2.succeed(t.ok.clone)
 } catch (err) {
   sp2.fail(`${t.err.clone}: ${err.message}`)
