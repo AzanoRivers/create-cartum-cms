@@ -1,0 +1,41 @@
+{
+  "name": "create-cartum-cms",
+  "version": "1.0.0",
+  "description": "Scaffold a new Cartum CMS project",
+  "type": "module",
+  "bin": {
+    "create-cartum-cms": "./bin/index.mjs"
+  },
+  "files": [
+    "bin"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "cartum",
+    "cms",
+    "headless",
+    "nextjs",
+    "scaffold",
+    "create"
+  ],
+  "author": {
+    "name": "AzanoLabs",
+    "url": "https://github.com/AzanoRivers"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AzanoRivers/create-cartum-cms.git"
+  },
+  "homepage": "https://github.com/AzanoRivers/create-cartum-cms#readme",
+  "bugs": {
+    "url": "https://github.com/AzanoRivers/create-cartum-cms/issues"
+  },
+  "dependencies": {
+    "kleur": "^4.1.5",
+    "prompts": "^2.4.2",
+    "tiged": "^2.12.7"
+  }
+}
